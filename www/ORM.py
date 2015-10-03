@@ -94,7 +94,7 @@ class IntegerField(Field):
         super().__int__(name,'bigint',priamry_key,default)
 
 #字符域
-class StringField(Field):
+class FloatField(Field):
 
     def __init__(self, name=None, priamry_key=False, default=0.0):
         super().__int__(name,'real',priamry_key,default)
