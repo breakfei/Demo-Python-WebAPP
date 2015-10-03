@@ -7,6 +7,10 @@ Models for user, blog, comment.
 
 __author__ = 'zhangshen'
 
+#test
+import www.ORM
+import asyncio
+
 import time, uuid
 from www.ORM import Model, StringField, BooleanField, FloatField, TextField
 
@@ -46,3 +50,13 @@ class Comment(Model):
     user_image = StringField(ddl='varchar(500)')
     content = TextField()
     created_at = FloatField(default=time.time)
+
+def test(loop):
+    yield from www.ORM.create_pool(loop=loop, user='www-data', password='www-data', database='awesome')
+    u= User(name='Test', email='test@example.com', passwd='12345678', image='about:blank')
+    yield from u.save()
+
+if __name__=='__main__':
+    loop=asyncio.get_event_loop()
+    loop.run_until_complete(test(loop))
+    loop.close()
