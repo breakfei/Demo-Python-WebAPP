@@ -9,14 +9,14 @@ def log(sql, args=()):
 #创建连接池
 @asyncio.coroutine
 def create_pool(loop, **kw):
-    logging.ingo('create database connection pool...')
+    logging.info('create database connection pool...')
     global _pool
     _pool=yield from aiomysql.create_pool(
         host=kw.get('host','localhost'),
-        port=kw.get('port',3306),
+        port=kw.get('port',3307),
         user=kw['user'],
         password=kw['password'],
-        db=kw['db'],
+        db=kw['database'],
         charset=kw.get('charset','utf8'),
         autocommit=kw.get('autocommit',True),
         maxsize=kw.get('maxsize',10),
@@ -66,7 +66,7 @@ def create_args_string(num):
 
 class Field(object):
 
-    def __int__(self, name, column_type, primary_key, default):
+    def __init__(self, name, column_type, primary_key, default):
         self.name = name
         self.column_type = column_type
         self.primary_key = primary_key
@@ -79,25 +79,25 @@ class Field(object):
 class StringField(Field):
 
     def __init__(self, name=None, priamry_key=False, default=None, ddl='varchar(100)'):
-        super().__int__(name,ddl,priamry_key,default)
+        super().__init__(name,ddl,priamry_key,default)
 
 #布尔域
 class BooleanField(Field):
 
-    def __init__(self, name=None, default=None):
-        super().__int__(name,'boolean',False,default)
+    def __init__(self, name=None, default=False):
+        super().__init__(name,'boolean',False,default)
 
 #整数域
 class IntegerField(Field):
 
     def __init__(self, name=None, priamry_key=False, default=0):
-        super().__int__(name,'bigint',priamry_key,default)
+        super().__init__(name,'bigint',priamry_key,default)
 
 #字符域
 class FloatField(Field):
 
     def __init__(self, name=None, priamry_key=False, default=0.0):
-        super().__int__(name,'real',priamry_key,default)
+        super().__init__(name,'real',priamry_key,default)
 
 class TextField(Field):
 
@@ -219,7 +219,7 @@ class Model(dict, metaclass=ModelMetaclass):
 
     @asyncio.coroutine
     def save(self):
-        args = list(map(self.getValueOrDefaul, self.__fields__))
+        args = list(map(self.getValueOrDefault, self.__fields__))
         args.append(self.getValueOrDefault(self.__primary_key__))
         rows = yield from execute(self.__insert__, args)
         if rows !=1:
