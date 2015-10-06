@@ -113,12 +113,12 @@ def index(request):
 
 @asyncio.coroutine
 def init(loop):
-    yield from www.ORM.create_pool(loop=loop, host='127.0.0.1', port=3307, user='www', password='www', db='awesome')
+    yield from www.ORM.create_pool(loop=loop, host='127.0.0.1', port=3307, user='www-data', password='www-data', database='awesome')
     app = web.Application(loop=loop, middlewares=[
         logger_factory, response_factory
     ])
     init_jinja2(app, filters= dict(datetime = datetime_filter))
-    add_routes(app, 'hanlers')
+    add_routes(app, 'handlers')
     add_static(app)
     srv = yield from loop.create_server(app.make_handler(), '127.0.0.1', 9000)
     logging.info('server started at http://127.0.0.1:9000...')

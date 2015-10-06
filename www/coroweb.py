@@ -149,7 +149,7 @@ def add_route(app, func):
     if not asyncio.iscoroutinefunction(func) and not inspect.isgeneratorfunction(func):
         func = asyncio.coroutine(func)
     logging.info('add route %s %s => %s(%s)' % (method, path, func.__name__, ', '.join(inspect.signature(func).parameters.keys())))
-    app.router.add_static(method, path, RequestHandler(app, func))
+    app.router.add_route(method, path, RequestHandler(app,func))
 
 def add_routes(app, module_name):
     n = module_name.rfind('.')
@@ -164,6 +164,6 @@ def add_routes(app, module_name):
         func =getattr(mod, attr)
         if callable(func):
             method = getattr(func, '__method__', None)
-            path = getattr(func, '__router__', None)
+            path = getattr(func, '__route__', None)
             if method and path:
                 add_route(app, func)
