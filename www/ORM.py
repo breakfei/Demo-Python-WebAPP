@@ -10,8 +10,8 @@ def log(sql, args=()):
 @asyncio.coroutine
 def create_pool(loop, **kw):
     logging.info('create database connection pool...')
-    global _pool
-    _pool=yield from aiomysql.create_pool(
+    global __pool
+    __pool=yield from aiomysql.create_pool(
         host=kw.get('host','localhost'),
         port=kw.get('port',3307),
         user=kw['user'],
@@ -27,8 +27,8 @@ def create_pool(loop, **kw):
 @asyncio.coroutine
 def select(sql, args, size=None):
     log(sql, args)
-    global _pool
-    with(yield from _pool) as conn:
+    global __pool
+    with(yield from __pool) as conn:
         cur= yield from conn.cursor(aiomysql.DictCursor)
         yield from cur.execute(sql.replace('?','%s'),args or ())
         if size:
@@ -42,7 +42,7 @@ def select(sql, args, size=None):
 @asyncio.coroutine
 def execute(sql, args, autocommit=True):
     log(sql)
-    with (yield from _pool) as conn:
+    with (yield from __pool) as conn:
         if not autocommit:
             yield from conn.begin()
         try:
@@ -78,8 +78,8 @@ class Field(object):
 #字符域
 class StringField(Field):
 
-    def __init__(self, name=None, priamry_key=False, default=None, ddl='varchar(100)'):
-        super().__init__(name,ddl,priamry_key,default)
+    def __init__(self, name=None, primary_key=False, default=None, ddl='varchar(100)'):
+        super().__init__(name,ddl,primary_key,default)
 
 #布尔域
 class BooleanField(Field):
@@ -90,14 +90,14 @@ class BooleanField(Field):
 #整数域
 class IntegerField(Field):
 
-    def __init__(self, name=None, priamry_key=False, default=0):
-        super().__init__(name,'bigint',priamry_key,default)
+    def __init__(self, name=None, primary_key=False, default=0):
+        super().__init__(name,'bigint',primary_key,default)
 
 #字符域
 class FloatField(Field):
 
-    def __init__(self, name=None, priamry_key=False, default=0.0):
-        super().__init__(name,'real',priamry_key,default)
+    def __init__(self, name=None, primary_key=False, default=0.0):
+        super().__init__(name,'real',primary_key,default)
 
 class TextField(Field):
 
@@ -135,7 +135,7 @@ class ModelMetaclass(type):
         attrs['__primary_key__'] = primaryKey #主键属性名
         attrs['__fields__'] = fields #除主键外的属性
         attrs['__select__'] = 'select `%s`, %s from `%s`' % (primaryKey, ', '.join(escaped_fields), tableName)
-        attrs['__insert__'] = 'insert into `%s` (%s, `%s`) value (%s)' %(tableName, ', '.join(escaped_fields), primaryKey, create_args_string(len(escaped_fields)+1))
+        attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' %(tableName, ', '.join(escaped_fields), primaryKey, create_args_string(len(escaped_fields)+1))
         attrs['__update__'] = 'update `%s` set %s where `%s`=?' % (tableName, ', '.join(map(lambda  f: '`%s`=?' % (mappings.get(f).name or f),fields)), primaryKey)
         attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (tableName, primaryKey)
         return  type.__new__(cls, name, bases, attrs)
@@ -149,7 +149,7 @@ class Model(dict, metaclass=ModelMetaclass):
         try:
             return self[key]
         except KeyError:
-            raise AttributeError(r"'Model' object hae no attributes '%s'" % key)
+            raise AttributeError(r"'Model' object hae no attribute '%s'" % key)
 
     def __setattr__(self, key, value):
         self[key] = value
@@ -170,7 +170,7 @@ class Model(dict, metaclass=ModelMetaclass):
     @classmethod
     @asyncio.coroutine
     def findAll(cls, where=None, args=None, **kw):
-        ' find objects by where claude. '
+        ' find objects by where clause. '
         sql = [cls.__select__]
         if where:
             sql.append('where')

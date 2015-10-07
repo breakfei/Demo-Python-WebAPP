@@ -8,9 +8,9 @@ configs = {
     'db': {
         'host': '127.0.0.1',
         'port': 3307,
-        'user': 'www',
-        'password': 'www',
-        'db': 'awesome'
+        'user': 'www-data',
+        'password': 'www-data',
+        'database': 'awesome'
     },
     'session': {
         'secret': 'Awesome'
