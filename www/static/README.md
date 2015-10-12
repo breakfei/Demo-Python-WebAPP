@@ -1,1 +1,0 @@
-it a directory to save static files
