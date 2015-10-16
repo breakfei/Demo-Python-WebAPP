@@ -5,12 +5,12 @@ __author__ = 'zhangshen'
 import re, time, json, logging, hashlib, base64, asyncio
 from aiohttp import web
 
-from www import markdown2
-from www.apis import APIValueError, APIError, APIPermissionError, APIResourceNotFoundError;
-from www.config import configs
-from www.coroweb import get, post
-from www.models import User, Blog, Comment, next_id
-from www.apis import Page
+import markdown2
+from apis import APIValueError, APIError, APIPermissionError, APIResourceNotFoundError;
+from config import configs
+from coroweb import get, post
+from models import User, Blog, Comment, next_id
+from apis import Page
 
 COOKIE_NAME = 'awesession'
 _COOKIE_KEY = configs.session.secret

@@ -6,10 +6,10 @@ from datetime import datetime
 from aiohttp import web
 from jinja2 import Environment, FileSystemLoader
 
-import www.ORM
-from www.coroweb import add_routes, add_static
-from www.config import configs
-from www.handlers import cookie2user, COOKIE_NAME
+import ORM
+from coroweb import add_routes, add_static
+from config import configs
+from handlers import cookie2user, COOKIE_NAME
 
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
@@ -134,14 +134,14 @@ def index(request):
 
 @asyncio.coroutine
 def init(loop):
-    yield from www.ORM.create_pool(loop=loop, **configs.db)
+    yield from ORM.create_pool(loop=loop, **configs.db)
     app = web.Application(loop=loop, middlewares=[
         logger_factory, auth_factory, response_factory
     ])
     init_jinja2(app, filters= dict(datetime = datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    srv = yield from loop.create_server(app.make_handler(), '127.0.0.1', 9000)
+    srv = yield from loop.create_server(app.make_handler(), '192.168.1.119', 9000)
     logging.info('server started at http://127.0.0.1:9000...')
     return srv
 

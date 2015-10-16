@@ -4,7 +4,7 @@ Configuration
 
 __author__ = 'zhangshen'
 
-from www import config_default, config_override
+import config_default, config_override
 
 class Dict(dict):
     '''
