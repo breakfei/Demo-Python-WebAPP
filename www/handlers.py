@@ -81,6 +81,10 @@ def index(*, page='1'):
         blogs = []
     else:
         blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(page.offset, page.limit))
+    summary = '大家好，我是张珅。这是我的第一个Python实战小项目，一个博客创作和分享网站，还望大家多多支持' \
+              '感谢廖雪峰老师通俗易懂的Python讲解。全部教程和源码在链接处，谢谢大家。最后，缩缩最可爱！！！'
+    blog = Blog(id='1', name='Python实战之我的web', summary=summary, created_at=time.time()-120)
+    blogs = [blog]
     return {
         '__template__': 'blogs.html',
         'page': page,
